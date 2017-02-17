@@ -103,7 +103,7 @@ module RSpec::Puppet
         end
       end
     end
-    def call_other_function(function_name, *args)
+    def call_function(function_name, *args)
         function = find_function(function_name)
         function.execute(*args)
     end

@@ -80,16 +80,16 @@ module RSpec::Puppet
     end
 
     def find_function(function_name = self.class.top_level_description.downcase)
-
       with_vardir do
         env = adapter.current_environment
 
         if Puppet.version.to_f >= 4.0
           context_overrides = compiler.context_overrides
           func = nil
-          Puppet.override(context_overrides, "rspec-test scope") do
-            loader = Puppet::Pops::Loaders.new(env)
-            func = V4FunctionWrapper.new(function_name, loader.private_environment_loader.load(:function, function_name), context_overrides)
+          loaders = Puppet::Pops::Loaders.new(env)
+          Puppet.push_context({ :loaders => loaders, :global_scope => context_overrides[:global_scope]}, "set globals")
+	  Puppet.override(context_overrides, "rspec-test scope") do
+            func = V4FunctionWrapper.new(function_name, loaders.private_environment_loader.load(:function, function_name), context_overrides)
             @scope = context_overrides[:global_scope]
           end
 
